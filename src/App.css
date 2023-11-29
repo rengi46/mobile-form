@@ -1,38 +1,109 @@
-.App {
-  text-align: center;
-}
+/* form styles */
+.App{
+  width: 80%;
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+  max-width: 400px;
+  margin: 30px auto;
+  /* margin-top: 100px; */
+  padding: 30px 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.3);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  gap: 20px;
+
+}
+/* end form styles */
+
+/* Input styles */
+.inputText {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+label {
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  font-size: 14px;
+  color: #8e8e8e;
+  pointer-events: none;
+  transition: 0.2s ease-out;
+}
+
+input {
+  width: 90%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+  transition: border-color 0.3s ease-out;
+}
+
+input:focus {
+  border-color: #4caf50; 
+}
+
+/* Estilo para el label cuando el input está enfocado o tiene valor */
+input:focus + label, input:not(:placeholder-shown) + label {
+  background-color: white;
+  padding: 0 5px;
+  top: -8px;
+  left: 5px;
+  font-size: 12px;
+  /* color: #4caf50; */
+}
+
+.error {
+  color: #ff0000;
+  font-size: 12px;
+  margin-top: 5px;
+}
+/* end Input styles */
+
+/* selector styles */
+
+.selectContainer {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+/* Estilos para el select */
+select {
+  width: 95%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+}
+
+/* end selector styles */
+
+/* data style */
+.react-datepicker-wrapper {
+  width: 100%;
+  margin-bottom:20px ;
+}
+/* data style */
+
+/* button */
+.buttonSubmit {
+  margin: 20px 0;
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  background-color: rgba(239, 73, 143, 1);
   color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease-out;
+  text-decoration: none;
 }
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
+/* button */
