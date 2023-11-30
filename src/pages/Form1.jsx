@@ -6,9 +6,10 @@ import 'react-datepicker/dist/react-datepicker.css';
 import Input from '../components/Input/Input';
 import PhoneInputField from '../components/phoneInput/PhoneInput';
 import { redirect, useNavigate } from 'react-router-dom';
+import { findEmail, postUser, postPointGame } from '../utils/functionsFetch';
 
 
-const Form1 = ({juego=""}) => {
+const Form1 = ({juego="",points=0}) => {
   const navigate = useNavigate()
 
   const [error, setError] = React.useState(null);
@@ -32,41 +33,13 @@ const Form1 = ({juego=""}) => {
 
   const handleSubmit = async(values) => {
     // Handle form submission
-    const dataFetch = await fetch('http://localhost:1337/api/usuarios', {
-      method: 'GET'
-    });
-    const dataJson = await dataFetch.json();
-    const dataUsers = dataJson.data;
-    const findEmail = dataUsers.find((user) => {
-      if (user.attributes.Email === values.Email) {
-        return user;
-      } 
-    });
-    if(findEmail === undefined) {
-      const data = {data:{
-        Name: values.Nombre,
-        Apellido: values.Apellido,
-        Email: values.Email,
-        dateBirthday: values.birthday,
-        Genero: values.genero,
-        NumberPhone: values.phoneNumber,
-        juego:Number(juego),
-      }};
-      const response = await fetch('http://localhost:1337/api/usuarios', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-      const json = await response.json();
-      navigate('/register/gracias');
-      console.log(json);
-    } else {
-      setError('El email ya existe');
-    }
-    
-    console.log(values);
+    let userDB = await findEmail(values.Email);
+    if(userDB === undefined) {
+      userDB = await postUser(values.Nombre,values.Apellido,values.Email,values.birthday,values.genero,values.phoneNumber);
+      console.log(userDB);
+    } 
+    await postPointGame(userDB.id,points,juego);
+    navigate('/register/gracias');
   };
 
   return (
@@ -128,3 +101,5 @@ const Form1 = ({juego=""}) => {
 };
 
 export default Form1;
+
+

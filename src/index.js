@@ -31,7 +31,7 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
   },
   {
-    path: "/register/:juego",
+    path: "/register/:juego/:points",
     element: <App/>,
     errorElement: <ErrorPage />,
   },

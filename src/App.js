@@ -3,11 +3,11 @@ import './App.css';
 import Form1 from './pages/Form1';
 
 function App() {
-  const {juego} = useParams();
+  const {juego,points} = useParams();
   return (
     <div className="App">
-      <img src='../logo.jpg' width={200} />
-     <Form1 juego={juego}/>
+      <img src='/logo.jpg' width={200} />
+     <Form1 juego={juego} points={points}/>
     </div>
   );
 }
