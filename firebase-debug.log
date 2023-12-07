@@ -1,0 +1,18 @@
+[debug] [2023-12-07T12:39:52.147Z] ----------------------------------------------------------------------
+[debug] [2023-12-07T12:39:52.149Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Sergi\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js functions:config:set variable.key=6328e724e6690b66a13fe10abc39d1a60fd13fd3138e78d3a1c824e8f6ce7ecab8a4854cc5872283437de7513a0c9f02eb4f70240ed920dfe1043c48e7e76e75863715c71d2a155a54062a4497ffc88a12a64f4a8a8b2b22b5023a34e7e094e9700adef0e625967e7883cfc80d06c08f3d608bc042ea08d1c82fbae51bdf0912 variable.id=REACT_APP_AUTHORIZATION
+[debug] [2023-12-07T12:39:52.149Z] CLI Version:   12.9.1
+[debug] [2023-12-07T12:39:52.150Z] Platform:      win32
+[debug] [2023-12-07T12:39:52.150Z] Node Version:  v18.13.0
+[debug] [2023-12-07T12:39:52.151Z] Time:          Thu Dec 07 2023 13:39:52 GMT+0100 (hora estándar de Europa central)
+[debug] [2023-12-07T12:39:52.151Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-12-07T12:39:52.278Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-12-07T12:39:52.279Z] > authorizing via signed-in user (phygitalbcnstudio@gmail.com)
+[debug] [2023-12-07T12:39:52.279Z] [iam] checking project mobilfront-e2dc3 for permissions ["firebase.projects.get","runtimeconfig.configs.create","runtimeconfig.configs.delete","runtimeconfig.configs.get","runtimeconfig.configs.list","runtimeconfig.configs.update","runtimeconfig.variables.create","runtimeconfig.variables.delete","runtimeconfig.variables.get","runtimeconfig.variables.list","runtimeconfig.variables.update"]
+[debug] [2023-12-07T12:39:52.282Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/mobilfront-e2dc3:testIamPermissions [none]
+[debug] [2023-12-07T12:39:52.282Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/mobilfront-e2dc3:testIamPermissions x-goog-quota-user=projects/mobilfront-e2dc3
+[debug] [2023-12-07T12:39:52.283Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/mobilfront-e2dc3:testIamPermissions {"permissions":["firebase.projects.get","runtimeconfig.configs.create","runtimeconfig.configs.delete","runtimeconfig.configs.get","runtimeconfig.configs.list","runtimeconfig.configs.update","runtimeconfig.variables.create","runtimeconfig.variables.delete","runtimeconfig.variables.get","runtimeconfig.variables.list","runtimeconfig.variables.update"]}
+[debug] [2023-12-07T12:39:53.304Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/mobilfront-e2dc3:testIamPermissions 200
+[debug] [2023-12-07T12:39:53.305Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/mobilfront-e2dc3:testIamPermissions {"permissions":["firebase.projects.get","runtimeconfig.configs.create","runtimeconfig.configs.delete","runtimeconfig.configs.get","runtimeconfig.configs.list","runtimeconfig.configs.update","runtimeconfig.variables.create","runtimeconfig.variables.delete","runtimeconfig.variables.get","runtimeconfig.variables.list","runtimeconfig.variables.update"]}
+[debug] [2023-12-07T12:39:53.306Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/mobilfront-e2dc3/services/runtimeconfig.googleapis.com [none]
+[debug] [2023-12-07T12:39:53.306Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/mobilfront-e2dc3/services/runtimeconfig.googleapis.com x-goog-quota-user=projects/mobilfront-e2dc3
