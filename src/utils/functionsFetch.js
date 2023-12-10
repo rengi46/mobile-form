@@ -1,12 +1,13 @@
 const autorization = process.env.REACT_APP_AUTHORIZATION;
 const url = process.env.REACT_APP_URL;
 
-var myHeaders = new Headers();
-myHeaders.append("Authorization", `Bearer ${autorization}`);
+
 
 
 async function  findEmail (email) {
-  const dataFetch = await fetch('http://localhost:1337/api/usuarios', {
+  const myHeaders = new Headers();
+  myHeaders.append("Authorization", `Bearer ${autorization}`);
+  const dataFetch = await fetch(url+'api/usuarios', {
     method: 'GET',
     headers: myHeaders
   });
@@ -21,25 +22,30 @@ async function  findEmail (email) {
 }
 
 async function  postUser (nombre,apellido,email,birthday,genero,phoneNumber) {
+  const myHeaders = new Headers();
+  myHeaders.append("Authorization", `Bearer ${autorization}`);
   myHeaders.append('Content-Type', 'application/json');
-  const data = {data:{
+  const data = {
     Name: nombre,
     Apellido: apellido,
     Email: email,
     dateBirthday: birthday,
     Genero: genero,
-    NumberPhone: phoneNumber,
-  }};
-  const response = await fetch('http://localhost:1337/api/usuarios', {
+    // NumberPhone: phoneNumber,
+  };
+  console.log(data);
+  const response = await fetch(url+'api/usuarios', {
     method: 'POST',
     headers: myHeaders,
-    body: JSON.stringify(data),
+    body: JSON.stringify({data:data}),
   });
   const json = await response.json();
-  return json;
+  return json.data;
 }
 
 async function  postPointGame(idUser,point,idGame) {
+  const myHeaders = new Headers();
+  myHeaders.append("Authorization", `Bearer ${autorization}`);
   myHeaders.append('Content-Type', 'application/json');
   const data = {data:{
     juego: Number(idGame),
@@ -47,7 +53,7 @@ async function  postPointGame(idUser,point,idGame) {
     points: Number(point),
   }};
   console.log(data);
-  const response = await fetch('http://localhost:1337/api/rank-games', {
+  const response = await fetch(url+'api/rank-games', {
     method: 'POST',
     headers: myHeaders,
     body: JSON.stringify(data),

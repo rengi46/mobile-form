@@ -20,15 +20,23 @@ const Form1 = ({juego="",points=0}) => {
   
   
 
-  // const url = process.env.REACT_APP_URL;
-  const url = "http://localhost:1337/api";
+  const url = process.env.REACT_APP_URL;
+
   const autorization = process.env.REACT_APP_AUTHORIZATION;
 
   var myHeaders = new Headers();
-  myHeaders.append("Authorization", `Bearer ${autorization}`);
-
+  
   useEffect(() => {
-    fetch(url+"/form-users?populate=Logo",{headers: myHeaders})
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${autorization}`);
+
+  var requestOptions = {
+    method: 'GET',
+    headers: myHeaders,
+    redirect: 'follow'
+  };
+
+  fetch(url+"api/form-users?populate=Logo", requestOptions)
       .then(res => res.json())
       .then(
         (result) => {
@@ -66,8 +74,9 @@ const Form1 = ({juego="",points=0}) => {
       userDB = await postUser(values.Nombre,values.Apellido,values.Email,values.birthday,values.genero,values.phoneNumber);
       console.log(userDB);
     } 
-    await postPointGame(userDB.id,points,juego);
-    navigate('/register/gracias');
+    console.log(userDB);
+    await postPointGame(1,1000,1);
+    // navigate('/register/gracias');
   };
 
   return (
@@ -76,7 +85,7 @@ const Form1 = ({juego="",points=0}) => {
     required &&
     
     <div>
-    {required?.Logo?.data && <img src={'http://localhost:1337'+required.Logo.data.attributes.formats.thumbnail.url} width={200} />}
+    {required?.Logo?.data && <img src={required.Logo.data.attributes.url} width={200} />}
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
