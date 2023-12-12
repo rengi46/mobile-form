@@ -7,7 +7,7 @@ const url = process.env.REACT_APP_URL;
 async function  findEmail (email) {
   const myHeaders = new Headers();
   myHeaders.append("Authorization", `Bearer ${autorization}`);
-  const dataFetch = await fetch(url+'api/usuarios', {
+  const dataFetch = await fetch(url+'/api/usuarios', {
     method: 'GET',
     headers: myHeaders
   });
@@ -21,7 +21,9 @@ async function  findEmail (email) {
   return findEmail;
 }
 
-async function  postUser (nombre,apellido,email,birthday,genero,phoneNumber) {
+async function  postUser (nombre,apellido,email,birthday,genero,phoneNumber,center) {
+  const generoBueno = genero === ""? null: genero;
+  const birthdayBueno = birthday === ""? null: birthday;
   const myHeaders = new Headers();
   myHeaders.append("Authorization", `Bearer ${autorization}`);
   myHeaders.append('Content-Type', 'application/json');
@@ -29,12 +31,13 @@ async function  postUser (nombre,apellido,email,birthday,genero,phoneNumber) {
     Name: nombre,
     Apellido: apellido,
     Email: email,
-    dateBirthday: birthday,
-    Genero: genero,
-    // NumberPhone: phoneNumber,
+    dateBirthday: birthdayBueno,
+    Genero: generoBueno,
+    NumberPhone: phoneNumber,
+    createdBy: 2,
   };
   console.log(data);
-  const response = await fetch(url+'api/usuarios', {
+  const response = await fetch(url+'/api/usuarios', {
     method: 'POST',
     headers: myHeaders,
     body: JSON.stringify({data:data}),
@@ -53,7 +56,7 @@ async function  postPointGame(idUser,point,idGame) {
     points: Number(point),
   }};
   console.log(data);
-  const response = await fetch(url+'api/rank-games', {
+  const response = await fetch(url+'/api/rank-games', {
     method: 'POST',
     headers: myHeaders,
     body: JSON.stringify(data),

@@ -11,37 +11,34 @@ import { findEmail, postUser, postPointGame } from '../utils/functionsFetch';
 
 
 const Form1 = ({juego="",points=0}) => {
+  const url = process.env.REACT_APP_URL;
+  const autorization = process.env.REACT_APP_AUTHORIZATION;
+
+
   const navigate = useNavigate()
 
   const [error, setError] = React.useState(null);
   
   const [required, setRequired] = React.useState({});
   
-  
-  
 
-  const url = process.env.REACT_APP_URL;
-
-  const autorization = process.env.REACT_APP_AUTHORIZATION;
-
-  var myHeaders = new Headers();
-  
   useEffect(() => {
-    var myHeaders = new Headers();
+    const myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${autorization}`);
 
-  var requestOptions = {
-    method: 'GET',
-    headers: myHeaders,
-    redirect: 'follow'
-  };
+    const requestOptions = {
+      method: 'GET',
+      headers: myHeaders,
+      redirect: 'follow'
+    };
 
-  fetch(url+"api/form-users?populate=Logo", requestOptions)
+  fetch(url+"/api/form-users/2?populate=centro,Logo,createdBy", requestOptions)
       .then(res => res.json())
       .then(
         (result) => {
-          console.log(result.data[0].attributes);
-          setRequired( result.data[0].attributes)
+          console.log(result);
+          if(result.data.length === 0) navigate('/register/gracias');
+          setRequired( result.data?.attributes)
         },
         (error) => {
           setError(error);
@@ -53,9 +50,10 @@ const Form1 = ({juego="",points=0}) => {
     Nombre: '',
     Apellido: '',
     Email: '',
-    birthday: '',
-    genero: '',
-    phoneNumber: '',
+    birthday: "",
+    genero: "",
+    phoneNumber: 0,
+    centro: required?.centro?.data?.attributes?.id,
   };
 
   const validationSchema = Yup.object({
@@ -71,12 +69,11 @@ const Form1 = ({juego="",points=0}) => {
     // Handle form submission
     let userDB = await findEmail(values.Email);
     if(userDB === undefined) {
-      userDB = await postUser(values.Nombre,values.Apellido,values.Email,values.birthday,values.genero,values.phoneNumber);
-      console.log(userDB);
+      userDB = await postUser(values.Nombre,values.Apellido,values.Email,values.birthday,values.genero,values.phoneNumber,values.centro);
     } 
     console.log(userDB);
-    await postPointGame(1,1000,1);
-    // navigate('/register/gracias');
+    await postPointGame(userDB?.id,points,juego);
+    navigate('/register/gracias');
   };
 
   return (

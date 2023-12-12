@@ -7,18 +7,17 @@ function App() {
   const {juego,points} = useParams();
   const secret = "phygitalKey";
 
-  // const base64Game = CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Base64.parse(juego));
-  // const decryptedGame = CryptoJS.AES.decrypt(base64Game, secret).toString(CryptoJS.enc.Utf8);
+  const base64Game = CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Base64.parse(juego));
+  const decryptedGame = CryptoJS.AES.decrypt(base64Game, secret).toString(CryptoJS.enc.Utf8);
   
-  // const base64Points = CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Base64.parse(points));
-  // const decryptedPoints = CryptoJS.AES.decrypt(base64Points, secret).toString(CryptoJS.enc.Utf8);
+  const base64Points = CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Base64.parse(points));
+  const decryptedPoints = CryptoJS.AES.decrypt(base64Points, secret).toString(CryptoJS.enc.Utf8);
 
-  const decryptedGame =1;
-  const decryptedPoints=10;
+
   return (
     <div className="App">
       
-     <Form1 juego={decryptedGame} points={decryptedPoints}/>
+      <Form1 juego={decryptedGame} points={decryptedPoints}/>
     </div>
   );
 }
