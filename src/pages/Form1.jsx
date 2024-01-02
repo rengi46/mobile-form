@@ -10,7 +10,7 @@ import { findEmail, postUser, postPointGame } from '../utils/functionsFetch';
 
 
 
-const Form1 = ({juego="",points=0}) => {
+const Form1 = ({juego="",points=0,premio}) => {
   const url = process.env.REACT_APP_URL;
   const autorization = process.env.REACT_APP_AUTHORIZATION;
 
@@ -32,13 +32,14 @@ const Form1 = ({juego="",points=0}) => {
       redirect: 'follow'
     };
 
-  fetch(url+"/api/form-users/2?populate=centro,Logo,createdBy", requestOptions)
+  fetch(url+"/api/form-users?populate=centro,Logo,createdBy", requestOptions)
       .then(res => res.json())
       .then(
         (result) => {
           console.log(result);
-          if(result.data.length === 0) navigate('/register/gracias');
-          setRequired( result.data?.attributes)
+          if(result.data === null) navigate('/register/gracias');
+          if(result.data?.length === 0) navigate('/register/gracias');
+          setRequired( result.data[0]?.attributes)
         },
         (error) => {
           setError(error);
@@ -69,9 +70,8 @@ const Form1 = ({juego="",points=0}) => {
     // Handle form submission
     let userDB = await findEmail(values.Email);
     if(userDB === undefined) {
-      userDB = await postUser(values.Nombre,values.Apellido,values.Email,values.birthday,values.genero,values.phoneNumber,values.centro);
+      userDB = await postUser(values.Nombre,values.Apellido,values.Email,values.birthday,values.genero,values.phoneNumber,values.centro,premio);
     } 
-    console.log(userDB);
     await postPointGame(userDB?.id,points,juego);
     navigate('/register/gracias');
   };

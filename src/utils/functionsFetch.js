@@ -21,7 +21,7 @@ async function  findEmail (email) {
   return findEmail;
 }
 
-async function  postUser (nombre,apellido,email,birthday,genero,phoneNumber,center) {
+async function  postUser (nombre,apellido,email,birthday,genero,phoneNumber,centro,premio) {
   const generoBueno = genero === ""? null: genero;
   const birthdayBueno = birthday === ""? null: birthday;
   const myHeaders = new Headers();
@@ -34,9 +34,9 @@ async function  postUser (nombre,apellido,email,birthday,genero,phoneNumber,cent
     dateBirthday: birthdayBueno,
     Genero: generoBueno,
     NumberPhone: phoneNumber,
+    Premio: premio,
     createdBy: 2,
   };
-  console.log(data);
   const response = await fetch(url+'/api/usuarios', {
     method: 'POST',
     headers: myHeaders,

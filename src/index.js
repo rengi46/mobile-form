@@ -9,6 +9,10 @@ import {
 import App from './App';
 import Gracias from './pages/Gracias';
 import { initializeApp } from "firebase/app";
+import FormNoPremio from './pages/FormNoPremio';
+import { Login } from './pages/Login';
+import { SignInProvider } from './hooks/useContext/singInContext';
+import MidelWearLogin from './midelwear/midelWearLogin';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -35,13 +39,30 @@ const router = createBrowserRouter([
     element: <App/>,
     errorElement: <ErrorPage />,
   },
+  {
+    path: "/register",
+    element: <FormNoPremio/>,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "/",
+    element: <Login/>,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "/check",
+    element: <MidelWearLogin/>,
+    errorElement: <ErrorPage />,
+  }
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
+    <SignInProvider>
+      <RouterProvider router={router} />
+    </SignInProvider>
     
-    <RouterProvider router={router} />
   </React.StrictMode>
 );
 

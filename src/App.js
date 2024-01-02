@@ -16,8 +16,7 @@ function App() {
 
   return (
     <div className="App">
-      
-      <Form1 juego={decryptedGame} points={decryptedPoints}/>
+      <Form1 juego={decryptedGame} points={decryptedPoints} premio={true}/>
     </div>
   );
 }
