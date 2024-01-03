@@ -5,7 +5,11 @@ const SignInContext = createContext();
 
 // Create the provider component
 const SignInProvider = ({ children }) => {
-  const [loginKey, setLoginKey] = useState(false);
+  let value = false
+  if(localStorage.getItem("value") !== null){
+    value = JSON.parse(localStorage.getItem("value"))
+  }
+  const [loginKey, setLoginKey] = useState(value);
 
   return (
     <SignInContext.Provider value={{ loginKey, setLoginKey }}>

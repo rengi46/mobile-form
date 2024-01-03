@@ -30,7 +30,7 @@ const AdminStoreGift = () => {
       redirect: 'follow'
     };
 
-  fetch(url+"/api/checks?populate=tienda", requestOptions)
+  fetch(url+"/api/checks?populate=users_permissions_user", requestOptions)
       .then(res => res.json())
       .then(
         (result) => {
@@ -41,13 +41,13 @@ const AdminStoreGift = () => {
           setError(error);
         }
       )
-  }, [])
+  }, [state])
   return (
     <div className="bg-gray-200 flex justify-center items-center h-screen w-screen">
     <div className=" border-t-8 rounded-sm border-indigo-600 bg-white p-12 pt-16 shadow-2xl w-96 relative h-96 overflow-y-auto ">
       <div className='w-full absolute top-0 left-0'>
-        <button onClick={()=>{setState(0)}} className='w-3/6 border-solid border-2 border-slate-200/50 p-2' >Check Code</button>
-        <button onClick={()=>{setState(1)}} className='w-3/6 border-solid border-b-2 border-slate-200/50 p-2' >Create Gift</button>
+        <button onClick={()=>{setState(0)}} className='w-3/6 border-solid border-2 border-slate-200/50 p-2' >Validar Codigo</button>
+        <button onClick={()=>{setState(1)}} className='w-3/6 border-solid border-b-2 border-slate-200/50 p-2' >Crear Regalo</button>
       </div>
       {
         state === 0 ? <CheckGift checks={checks} loginKey={loginKey}/> : <CreateGift checks={checks} loginKey={loginKey}/>
@@ -60,6 +60,7 @@ const AdminStoreGift = () => {
 function CheckGift({checks,loginKey}) {
   const [value, setValue] = React.useState("");
   const [error, setError] = React.useState(null);
+  const [success, setSuccess] = React.useState(null);
   onchange = (e) => {
     setValue(e.target.value);
     setError(null);
@@ -68,21 +69,23 @@ function CheckGift({checks,loginKey}) {
     e.preventDefault();
     const cheque = checks.filter(check => {
       return check.attributes.code === value  })[0]
-    console.log(cheque);
     if(!cheque?.id) return setError("No existe el cheque");
-    if(cheque.attributes.tienda?.data?.attributes.Nombre !== loginKey.user.email) return setError("El cheque no es de esta tienda");
+    if(cheque.attributes.users_permissions_user?.data?.attributes.username !== loginKey.user.username) return setError("El cheque no es de esta tienda");
     if(!cheque.attributes.emailEnviado) return setError("El cheque no ha sido enviado");
-    if(cheque.attributes.regaloEntregado) return setError("El cheque ya ha sido usado");
-    console.log(cheque);
-
-      const myHeaders = new Headers();
+    console.log(new Date(cheque.attributes.updatedAt));
+    if(cheque.attributes.regaloEntregado) {
+      const date = new Date(cheque.attributes.updatedAt)
+      setError("El cheque ya ha sido usado el dia: "+ date.getDate() +"/"+ (date.getMonth()+1) +"/"+ date.getFullYear() +" a las "+ date.getHours() +":"+ date.getMinutes());
+      return
+    } 
+    const myHeaders = new Headers();
       myHeaders.append("Authorization", `Bearer ${autorization}`);
       myHeaders.append("Content-Type", `application/json`);
   
       const requestOptions = {
         method: 'PUT',
         headers: myHeaders,
-        body: JSON.stringify({data: {"publishedAt": null}}),
+        body: JSON.stringify({data: {"regaloEntregado": true}}),
         redirect: 'follow'
       };
   
@@ -91,6 +94,9 @@ function CheckGift({checks,loginKey}) {
         .then(
           (result) => {
             console.log(result);
+            setValue("");
+            setError(null);
+            setSuccess("Cheque usado correctamente");
           },
           (error) => {
             setError(error);
@@ -100,11 +106,10 @@ function CheckGift({checks,loginKey}) {
   }
   return (
     <div>
-       <h1 className="font-bold text-center block text-2xl">Check your code</h1>
+       <h1 className="font-bold text-center block text-2xl">Validar el Codigo Regalo</h1>
       <form className='flex flex-col'>
-      <Input id="email" name="email" label="Code to check" placeholder="code" autofocus={true}  onChange={onchange} value={value}/>
-     
-        <Button value="Submit" onClick={onSubmit}/>
+      <Input id="email" name="email" label="Codigo a validar" placeholder="code" autofocus={true}  onChange={onchange} value={value}/>
+        <Button value="Validar" onClick={onSubmit}/>
       </form>
     {
       error && 
@@ -113,6 +118,17 @@ function CheckGift({checks,loginKey}) {
         <span className="block sm:inline">{error}</span>
       </div>
     }
+    {
+          success && <div class="flex items-center p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
+          <svg class="flex-shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+          </svg>
+          <span class="sr-only">Info</span>
+          <div>
+            <span class="font-medium">{success}</span> 
+          </div>
+        </div>
+    }
     </div>
   )
 }
@@ -120,6 +136,7 @@ function CheckGift({checks,loginKey}) {
 function CreateGift({checks,loginKey}) {
   const [value, setValue] = React.useState("");
   const [error, setError] = React.useState(null);
+  const [success, setSuccess] = React.useState(null);
   onchange = (e) => {
     setValue(e.target.value);
     setError(null);
@@ -145,12 +162,11 @@ function CreateGift({checks,loginKey}) {
   });
 
   const handleSubmit = (values) => {
-    console.log("aaaaa");
-    console.log(values);
     const code = values.Regalo.split("")[0] + values.Descripcion.split("")[0] + values.CantidadCheques;
     const data = {"data":{
       "Max":values.CantidadCheques,
       "codigoRegalo":code,
+      "users_permissions_user":loginKey.user.id,
       "Descripcion": values.Descripcion,
       "Fin": values.Fin,
       "FinPromo":values.FinPromo,
@@ -175,6 +191,13 @@ function CreateGift({checks,loginKey}) {
       .then(
         (result) => {
           console.log(result);
+          initialValues.Regalo = "";
+          initialValues.CantidadCheques = 1;
+          initialValues.Inicio = new Date();
+          initialValues.Fin = new Date();
+          initialValues.FinPromo = new Date();
+          initialValues.Descripcion = "";
+          setSuccess("Regalo creado");
         },
         (error) => {
           setError(error);
@@ -197,12 +220,12 @@ function CreateGift({checks,loginKey}) {
         </label>
       </div>
         <div className='inputCreate'>
-        <label className="relative  text-gray-500 pointer-events-auto  mt-3" >CantidadCheques
+        <label className="relative  text-gray-500 pointer-events-auto  mt-3" >Cantidad Cheques
           <Field type="number" id="CantidadCheques" name="CantidadCheques"  placeholder="Cantidad de Cheques" />
         </label>
         </div>
         <div>
-        <label className="relative  text-gray-500 pointer-events-auto  mt-3">Inicio
+        <label className="relative  text-gray-500 pointer-events-auto  mt-3">Empezar a dar los cheques:
 
           <Field name="Inicio">
             {({ field, form }) => (
@@ -222,7 +245,7 @@ function CreateGift({checks,loginKey}) {
           </label>
         </div>
         <div>
-        <label className="relative  text-gray-500 pointer-events-auto  mt-3">Fin
+        <label className="relative  text-gray-500 pointer-events-auto  mt-3">Fin de a dar los cheques:
    
           <Field name="Fin">
             {({ field, form }) => (
@@ -242,7 +265,7 @@ function CreateGift({checks,loginKey}) {
           </label>
         </div>
         <div>
-          <label className="relative  text-gray-500 pointer-events-auto  mt-3">FinPromo
+          <label className="relative  text-gray-500 pointer-events-auto  mt-3">Fin de la promocion de los cheques:
           <Field name="FinPromo">
             {({ field, form }) => (
               <ReactDatePicker
@@ -284,7 +307,18 @@ function CreateGift({checks,loginKey}) {
         {
           error && <div className='error'>{error}</div>
         }
-        <Button value="submit" type='submit'/>
+       {
+          success && <div class="flex items-center p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
+          <svg class="flex-shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+          </svg>
+          <span class="sr-only">Info</span>
+          <div>
+            <span class="font-medium">{success}</span> 
+          </div>
+        </div>
+    }
+        <Button value="Crear" type='submit'/>
       </Form>
     </Formik>
     </div>

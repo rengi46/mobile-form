@@ -68,12 +68,19 @@ const Form1 = ({juego="",points=0,premio}) => {
 
   const handleSubmit = async(values) => {
     // Handle form submission
-    let userDB = await findEmail(values.Email);
-    if(userDB === undefined) {
-      userDB = await postUser(values.Nombre,values.Apellido,values.Email,values.birthday,values.genero,values.phoneNumber,values.centro,premio);
-    } 
-    await postPointGame(userDB?.id,points,juego);
-    navigate('/register/gracias');
+    try{
+      let userDB = await findEmail(values.Email);
+      console.log(userDB);
+      if(userDB === undefined) {
+        userDB = await postUser(values.Nombre,values.Apellido,values.Email,values.birthday,values.genero,values.phoneNumber,values.centro,premio);
+        navigate('/register/gracias');
+      } 
+      await postPointGame(userDB?.id,points,juego);
+      setError("Ya estas registrado")
+    }catch(error){
+      console.log(error);
+      setError(error);
+    }
   };
 
   return (
