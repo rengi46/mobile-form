@@ -14,11 +14,9 @@ const Form1 = ({juego="",points=0,premio}) => {
   const url = process.env.REACT_APP_URL;
   const autorization = process.env.REACT_APP_AUTHORIZATION;
 
-
   const navigate = useNavigate()
 
   const [error, setError] = React.useState(null);
-  
   const [required, setRequired] = React.useState({});
   
 
@@ -53,7 +51,7 @@ const Form1 = ({juego="",points=0,premio}) => {
     Email: '',
     birthday: "",
     genero: "",
-    phoneNumber: 0,
+    phoneNumber: "+34",
     centro: required?.centro?.data?.attributes?.id,
   };
 
@@ -73,8 +71,11 @@ const Form1 = ({juego="",points=0,premio}) => {
       console.log(userDB);
       if(userDB === undefined) {
         userDB = await postUser(values.Nombre,values.Apellido,values.Email,values.birthday,values.genero,values.phoneNumber,values.centro,premio);
+        console.log(userDB);
+        await postPointGame(userDB?.id,points,juego);
         navigate('/register/gracias');
       } 
+      console.log(userDB);
       await postPointGame(userDB?.id,points,juego);
       setError("Ya estas registrado")
     }catch(error){
@@ -89,7 +90,9 @@ const Form1 = ({juego="",points=0,premio}) => {
     required &&
     
     <div>
-    {required?.Logo?.data && <img src={required.Logo.data.attributes.url} width={200} />}
+    <div className='w-full p-2'>
+      {required?.Logo?.data && <img src={required.Logo.data.attributes.url} width={200} />}
+    </div>
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}

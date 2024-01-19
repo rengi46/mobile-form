@@ -5,9 +5,13 @@ import * as Yup from 'yup';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 // import DatePicker from 'react-native-date-picker';
 import ReactDatePicker from 'react-datepicker';
+import { getCheks, postCheck, postRegalo } from '../utils/functionsFetch';
+import { variables } from '../utils/config';
+import { confirmAlert } from 'react-confirm-alert'; // Importa la función de alerta de confirmación
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Importa los estilos CSS (puedes personalizar los estilos según tus necesidades)
 
-const url = process.env.REACT_APP_URL;
-const autorization = process.env.REACT_APP_AUTHORIZATION;
+
+
 
 const AdminStoreGift = () => {
   const navigate = useNavigate()
@@ -19,31 +23,23 @@ const AdminStoreGift = () => {
   const [checks, setChecks] = React.useState([]);
   const [error, setError] = React.useState(null);
  
+  function logOut() {
+    console.log("logOut");
+    localStorage.removeItem('loginKey')
+    window.location.href = "/"
+  }
 
   useEffect(() => {
-    const myHeaders = new Headers();
-    myHeaders.append("Authorization", `Bearer ${autorization}`);
-
-    const requestOptions = {
-      method: 'GET',
-      headers: myHeaders,
-      redirect: 'follow'
-    };
-
-  fetch(url+"/api/checks?populate=users_permissions_user", requestOptions)
-      .then(res => res.json())
-      .then(
-        (result) => {
-          console.log(result);
-          setChecks(result.data);
-        },
-        (error) => {
-          setError(error);
-        }
-      )
+    const fetchCheck = async()=>{
+      const cheks = await getCheks()
+      setChecks(cheks)
+    }
+  fetchCheck()
+  console.log(checks);
   }, [state])
   return (
-    <div className="bg-gray-200 flex justify-center items-center h-screen w-screen">
+    <div className="bg-gray-200 flex justify-center items-center h-screen w-screen relative">
+      <button className='absolute top-2 right-2 ' onClick={logOut}>logOut</button>
     <div className=" border-t-8 rounded-sm border-indigo-600 bg-white p-12 pt-16 shadow-2xl w-96 relative h-96 overflow-y-auto ">
       <div className='w-full absolute top-0 left-0'>
         <button onClick={()=>{setState(0)}} className='w-3/6 border-solid border-2 border-slate-200/50 p-2' >Validar Codigo</button>
@@ -65,43 +61,25 @@ function CheckGift({checks,loginKey}) {
     setValue(e.target.value);
     setError(null);
   }
-  const onSubmit = (e) => {
+  const onSubmit = async(e) => {
     e.preventDefault();
     const cheque = checks.filter(check => {
       return check.attributes.code === value  })[0]
     if(!cheque?.id) return setError("No existe el cheque");
     if(cheque.attributes.users_permissions_user?.data?.attributes.username !== loginKey.user.username) return setError("El cheque no es de esta tienda");
     if(!cheque.attributes.emailEnviado) return setError("El cheque no ha sido enviado");
-    console.log(new Date(cheque.attributes.updatedAt));
     if(cheque.attributes.regaloEntregado) {
       const date = new Date(cheque.attributes.updatedAt)
       setError("El cheque ya ha sido usado el dia: "+ date.getDate() +"/"+ (date.getMonth()+1) +"/"+ date.getFullYear() +" a las "+ date.getHours() +":"+ date.getMinutes());
       return
     } 
-    const myHeaders = new Headers();
-      myHeaders.append("Authorization", `Bearer ${autorization}`);
-      myHeaders.append("Content-Type", `application/json`);
-  
-      const requestOptions = {
-        method: 'PUT',
-        headers: myHeaders,
-        body: JSON.stringify({data: {"regaloEntregado": true}}),
-        redirect: 'follow'
-      };
-  
-    fetch(url+"/api/checks/"+cheque.id, requestOptions)
-        .then(res => res.json())
-        .then(
-          (result) => {
-            console.log(result);
-            setValue("");
-            setError(null);
-            setSuccess("Cheque usado correctamente");
-          },
-          (error) => {
-            setError(error);
-          }
-        )
+    const result = await postCheck(cheque.id)
+    //TODO comprobar resultado de la peticion
+    console.log(result);
+    setValue("");
+    setError(null);
+    setSuccess("Cheque usado correctamente");
+
 
   }
   return (
@@ -137,6 +115,10 @@ function CreateGift({checks,loginKey}) {
   const [value, setValue] = React.useState("");
   const [error, setError] = React.useState(null);
   const [success, setSuccess] = React.useState(null);
+  const [openPopUp, setOpenPopUp] = React.useState(false);
+
+  const HandleRemovePopUp = () => setOpenPopUp(false);
+
   onchange = (e) => {
     setValue(e.target.value);
     setError(null);
@@ -161,48 +143,61 @@ function CreateGift({checks,loginKey}) {
     Descripcion:  Yup.string(),
   });
 
-  const handleSubmit = (values) => {
-    const code = values.Regalo.split("")[0] + values.Descripcion.split("")[0] + values.CantidadCheques;
-    const data = {"data":{
-      "Max":values.CantidadCheques,
-      "codigoRegalo":code,
-      "users_permissions_user":loginKey.user.id,
-      "Descripcion": values.Descripcion,
-      "Fin": values.Fin,
-      "FinPromo":values.FinPromo,
-      "Inicio":values.Inicio ,
-      "Regalo": values.Regalo,
-      "genero": values,
-      "createdBy":1
-  }}
-    const myHeaders = new Headers();
-    myHeaders.append("Authorization", `Bearer ${autorization}`);
-    myHeaders.append("Content-Type", `application/json`);
+  function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return String(Math.floor(Math.random() * (max - min) + min)); // The maximum is exclusive and the minimum is inclusive
+  }
 
-    const requestOptions = {
-      method: 'POST',
-      headers: myHeaders,
-      body: JSON.stringify(data),
-      redirect: 'follow'
-    };
+  const handleSubmit = async(values,{resetForm}) => {
+    confirmAlert({
+      title: 'Confirmar acción', // Título de la alerta
+      message: '¿Estás seguro de que deseas realizar esta acción?', // Mensaje de la alerta
+      buttons: [
+        {
+          label: 'Sí', // Etiqueta del botón de aceptar
+          onClick: async() => {
+            // Lógica a ejecutar si el usuario hace clic en "Sí"
+            console.log('Usuario hizo clic en Sí');
 
-  fetch(url+"/api/regalos/", requestOptions)
-      .then(res => res.json())
-      .then(
-        (result) => {
-          console.log(result);
-          initialValues.Regalo = "";
-          initialValues.CantidadCheques = 1;
-          initialValues.Inicio = new Date();
-          initialValues.Fin = new Date();
-          initialValues.FinPromo = new Date();
-          initialValues.Descripcion = "";
-          setSuccess("Regalo creado");
+              const lettersCode = values.Regalo.split("")
+              const numberCode = getRandomInt(100, 999)
+              const code = lettersCode[0]+lettersCode[1]+lettersCode[2]+ numberCode;
+              const data = {"data":{
+                "Max":values.CantidadCheques,
+                "codigoRegalo":code,
+                "users_permissions_user":loginKey.user.id,
+                "Descripcion": values.Descripcion,
+                "Fin": values.Fin,
+                "FinPromo":values.FinPromo,
+                "Inicio":values.Inicio ,
+                "Regalo": values.Regalo,
+                "genero": values,
+                "createdBy":variables.ID_CLIENTE,
+              }}
+              setOpenPopUp(true)
+              console.log("handleSubmit");
+              const result = await postRegalo(data)
+            if(result){
+              resetForm();
+              setSuccess("Regalo creado");
+            }
+          }
         },
-        (error) => {
-          setError(error);
+        {
+          label: 'No', // Etiqueta del botón de cancelar
+          onClick: () => {
+            // Lógica a ejecutar si el usuario hace clic en "No"
+            console.log('Usuario hizo clic en No');
+          }
         }
-      )
+      ]
+    });
+
+
+
+
+ 
   };
 
   return (
@@ -350,6 +345,36 @@ function Input({type, id, name, label, placeholder, autofocus,onChange,value}) {
     </label>
   )
 }
+
+const PopUp = ({ openPopUp, closePopUp }) => {
+
+  const handlelosePopUp = (e) => {
+    if (e.target.id === 'ModelContainer') {
+      closePopUp();
+    }
+  }
+
+  if (openPopUp !== true) return null
+
+  return (
+    <div
+      id='ModelContainer'
+      onClick={handlelosePopUp}
+      className='fixed inset-0 bg-black flex justify-center items-center bg-opacity-20 backdrop-blur-sm'>
+      <div 
+        className='p-2 bg-white w-10/12 md:w-1/2 lg:1/3 shadow-inner border-e-emerald-600 rounded-lg py-5'>
+        <div
+          className='w-full p-3 justify-center items-center'>
+          <h2
+            className='font-semibold py-3 text-center text-xl'>
+              My PopUP
+          </h2>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 
 
 export default AdminStoreGift

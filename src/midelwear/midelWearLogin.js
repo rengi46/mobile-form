@@ -5,7 +5,6 @@ import AdminStoreGift from '../pages/AdminStoreGift';
 
 const MidelWearLogin = () => {
   const context = useContext(SignInContext)
-  console.log(context.loginKey);
   if(!context.loginKey) return (window.location.href='/')
    return (<AdminStoreGift/>)
 }

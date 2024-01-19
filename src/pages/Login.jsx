@@ -29,7 +29,6 @@ export const  Login = ()=>{
       "identifier": email,
       "password": password
     });
-    console.log(raw);
     
     var requestOptions = {
       method: 'POST',
@@ -52,6 +51,7 @@ export const  Login = ()=>{
       .then(result =>{setError(" contraseña o email no valido"); })
   }
   useEffect(() => {
+    localStorage.setItem('loginKey', JSON.stringify(loginKey))
     if(loginKey) navigate('/check')
   }, [loginKey])
   return (
