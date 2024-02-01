@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import Input from '../components/Input/Input';
 import PhoneInputField from '../components/phoneInput/PhoneInput';
 import { redirect, useNavigate } from 'react-router-dom';
 import { findEmail, postUser, postPointGame } from '../utils/functionsFetch';
+import dayjs from 'dayjs';
 
 
 
@@ -49,7 +49,7 @@ const Form1 = ({juego="",points=0,premio}) => {
     Nombre: '',
     Apellido: '',
     Email: '',
-    birthday: "",
+    birthday: "11/11/1990",
     genero: "",
     phoneNumber: "+34",
     centro: required?.centro?.data?.attributes?.id,
@@ -68,14 +68,11 @@ const Form1 = ({juego="",points=0,premio}) => {
     // Handle form submission
     try{
       let userDB = await findEmail(values.Email);
-      console.log(userDB);
       if(userDB === undefined) {
-        userDB = await postUser(values.Nombre,values.Apellido,values.Email,values.birthday,values.genero,values.phoneNumber,values.centro,premio);
-        console.log(userDB);
+        userDB = await postUser(values.Nombre,values.Apellido,values.Email,values.birthday.$d,values.genero,values.phoneNumber,values.centro,premio);
         await postPointGame(userDB?.id,points,juego);
         navigate('/register/gracias');
-      } 
-      console.log(userDB);
+      }
       await postPointGame(userDB?.id,points,juego);
       setError("Ya estas registrado")
     }catch(error){
@@ -106,15 +103,10 @@ const Form1 = ({juego="",points=0,premio}) => {
           {/* Utilizando react-datepicker */}
           <Field name="birthday">
             {({ field, form }) => (
-              <DatePicker
-                {...field}
-                selected={field.value}
+              <MyDatePicker
+                value={field.value}
                 onChange={(date) => form.setFieldValue(field.name, date)}
-                dateFormat="dd/MM/yyyy"
-                showYearDropdown
-                showMonthDropdown
-                dropdownMode="select"
-                placeholderText="Selecciona la fecha de nacimiento"
+               
               />
             )}
           </Field>
@@ -156,3 +148,19 @@ const Form1 = ({juego="",points=0,premio}) => {
 export default Form1;
 
 
+const MyDatePicker = ({value,onChange}) => {
+  const [selectedDate, setSelectedDate] = React.useState(new Date());
+  if(!value) value = selectedDate;
+
+  return (
+    <div className="relative my-4 max-w-sm">
+
+    <DatePicker
+      value={dayjs(value)}
+      onChange={onChange}
+      // className=" text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      // placeholderText="Select date"
+    />
+  </div>
+  );
+};

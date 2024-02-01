@@ -2,6 +2,8 @@ import { useParams } from 'react-router-dom';
 import './App.css';
 import Form1 from './pages/Form1';
 import CryptoJS from 'crypto-js';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 function App() {
   const {juego,points} = useParams();
@@ -15,9 +17,11 @@ function App() {
 
 
   return (
-    <div className="App">
-      <Form1 juego={decryptedGame} points={decryptedPoints} premio={true}/>
-    </div>
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <div className="App">
+        <Form1 juego={decryptedGame} points={decryptedPoints} premio={true}/>
+      </div>
+  </LocalizationProvider>
   );
 }
 
